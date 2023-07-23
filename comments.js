@@ -1,20 +1,17 @@
-// write a program to read data from csv file
-// and display all the comments in the console
-// https://jsonplaceholder.typicode.com/comments
+// Create a Web server that can listen to requests for /comments.json and serve up 
+// our JavaScript object. Remember to set the Content-Type header to application/json.
+var http = require('http');
+var fs = require('fs');
+var port = 8080;
 
-const fs = require('fs'); // require module for file system
-const csv = require('csv-parser'); // require module for csv-parser
-const request = require('request'); // require module for request
+var server = http.createServer(function (req, res) {
+    res.writeHead(200, {'Content-Type': 'application/json'});
+    fs.readFile('./comments.json', 'utf8', function (err, data) {
+        if (err) throw err;
+        res.end(data);
+    });
+});
 
-const file = fs.createWriteStream('comments.csv'); // create a file
-
-request('https://jsonplaceholder.typicode.com/comments').pipe(file); // get data from the url and write to the file
-
-fs.createReadStream('comments.csv')
-  .pipe(csv())
-  .on('data', (row) => {
-    console.log(row.email); // display all the comments in the console
-  })
-  .on('end', () => {
-    console.log('CSV file successfully processed');
-  });
+server.listen(port, function () {
+    console.log('Server listening on http://localhost:%s', port);
+});
